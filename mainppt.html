@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Raw Verify</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      background: #f9f9fc;
+      color: #222;
+    }
+    header {
+      background: linear-gradient(90deg, #1e3a8a, #b30059);
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+    }
+    header h1 {
+      margin: 0;
+      font-size: 2.5rem;
+      font-weight: 900;
+      text-align: center;
+      flex: 1;
+      color: #fff;
+    }
+    nav {
+      display: flex;
+      gap: 1.5rem;
+      align-items: center;
+    }
+    nav a {
+      text-decoration: none;
+      color: #fff;
+      font-weight: bold;
+      transition: color 0.3s;
+    }
+    nav a:hover {
+      color: #ffe6f0;
+    }
+    .hero {
+      text-align: center;
+      padding: 4rem 2rem;
+      background: #f0f4ff;
+    }
+    .hero h2 {
+      color: #1e3a8a;
+      font-size: 2rem;
+      margin-bottom: 1rem;
+    }
+    .hero p {
+      font-size: 1.2rem;
+      color: #333;
+      margin: 0.5rem auto;
+      max-width: 800px;
+      line-height: 1.6;
+    }
+    .hero strong {
+      display: block;
+      margin-top: 1rem;
+      font-size: 1.1rem;
+      color: #b30059;
+      font-weight: bold;
+      background: #ffe6f0;
+      padding: 0.5rem 1rem;
+      border-radius: 6px;
+      display: inline-block;
+    }
+    .why-matters {
+      background: linear-gradient(90deg, #0d1b2a, #1e3a8a);
+      color: #fff;
+      padding: 4rem 2rem;
+      text-align: center;
+    }
+    .why-matters h2 {
+      font-size: 2.2rem;
+      margin-bottom: 2rem;
+      font-weight: 800;
+      color: #ff3366;
+    }
+    .impact-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 2rem;
+    }
+    .impact-card {
+      position: relative;
+      overflow: hidden;
+      border-radius: 12px;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.4);
+      transition: transform 0.3s;
+      cursor: pointer;
+    }
+    .impact-card img {
+      width: 100%;
+      height: 220px;
+      object-fit: cover;
+      filter: brightness(70%);
+      transition: 0.4s;
+    }
+    .impact-card:hover {
+      transform: translateY(-8px);
+    }
+    .impact-card:hover img {
+      filter: brightness(100%);
+    }
+    .overlay {
+      position: absolute;
+      bottom: 0;
+      background: rgba(0,0,0,0.6);
+      color: #fff;
+      padding: 1rem;
+      width: 100%;
+      text-align: left;
+    }
+    .overlay h3 {
+      color: #ff3366;
+      margin: 0 0 0.5rem;
+      font-size: 1.2rem;
+    }
+    .overlay p {
+      font-size: 0.95rem;
+      line-height: 1.4;
+    }
+    .materials {
+      padding: 3rem 1rem;
+      max-width: 1000px;
+      margin: auto;
+    }
+    .materials h2 {
+      text-align: center;
+      color: #1e3a8a;
+      font-size: 1.8rem;
+      margin-bottom: 2rem;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 1.5rem;
+    }
+    .card {
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 6px 16px rgba(0,0,0,0.1);
+      padding: 1.5rem;
+      text-align: center;
+      transition: transform 0.3s, box-shadow 0.3s;
+    }
+    .card:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+    }
+    .card h3 {
+      margin: 0 0 0.5rem;
+      color: #b30059;
+      font-size: 1.2rem;
+    }
+    .companies {
+      font-size: 0.95rem;
+      color: #444;
+    }
+    .upload-section {
+      padding: 3rem 1rem;
+      max-width: 800px;
+      margin: auto;
+      text-align: center;
+    }
+    .upload-section h2 {
+      color: #1e3a8a;
+      font-size: 1.8rem;
+      margin-bottom: 2rem;
+    }
+    .upload-container {
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 6px 16px rgba(0,0,0,0.1);
+      padding: 2rem;
+    }
+    .file-input-wrapper {
+      position: relative;
+      margin: 1.5rem 0;
+      display: inline-block;
+      cursor: pointer;
+      width: 100%;
+    }
+    .file-input {
+      position: absolute;
+      opacity: 0;
+      width: 100%;
+      height: 100%;
+      cursor: pointer;
+    }
+    .file-input-button {
+      display: block;
+      background: linear-gradient(90deg, #1e3a8a, #b30059);
+      color: white;
+      padding: 12px 24px;
+      border-radius: 6px;
+      font-weight: bold;
+      transition: transform 0.3s;
+    }
+    .file-input-button:hover {
+      transform: translateY(-3px);
+    }
+    .preview-container {
+      margin-top: 2rem;
+      display: none;
+    }
+    .preview-image {
+      max-width: 100%;
+      max-height: 400px;
+      border-radius: 8px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+    .submit-button {
+      background: linear-gradient(90deg, #1e3a8a, #b30059);
+      color: white;
+      border: none;
+      padding: 12px 30px;
+      border-radius: 6px;
+      font-weight: bold;
+      cursor: pointer;
+      margin-top: 1rem;
+      transition: transform 0.3s;
+      display: none;
+    }
+    .submit-button:hover {
+      transform: translateY(-3px);
+    }
+    .notification {
+      position: fixed;
+      top: 100px;
+      right: 20px;
+      background: #4CAF50;
+      color: white;
+      padding: 15px 25px;
+      border-radius: 6px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+      display: none;
+      z-index: 1001;
+    }
+    footer {
+      text-align: center;
+      padding: 1rem;
+      background: #1e3a8a;
+      margin-top: 3rem;
+      font-size: 0.9rem;
+      color: #fff;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Raw Verify</h1>
+    <nav>
+      <a href="integrity.html">Integrity Hub</a>
+      <a href="realcases.html">Real Case Scenarios</a>
+      <a href="corruption.html">Daily Corruption Ratio</a>
+      <a href="about.html">About Us</a>
+    </nav>
+  </header>
+  
+  <section class="hero">
+    <h2>Building Transparency in Construction</h2>
+    <p>Explore the best quality raw materials, real corruption cases, and transparent systems for a better future.</p>
+    <strong>RAW Verify brings truth and transparency to construction projects.</strong>
+  </section>
+  
+  <section class="why-matters">
+    <h2>Why Corruption in Construction Matters</h2>
+    <div class="impact-grid">
+      <div class="impact-card">
+        <img src="https://picsum.photos/seed/cost/400/220.jpg" alt="Cost Overruns">
+        <div class="overlay">
+          <h3>💸 Cost Overruns</h3>
+          <p>30–40% of project funds are lost to inflated raw material prices.</p>
+        </div>
+      </div>
+      <div class="impact-card">
+        <img src="https://picsum.photos/seed/quality/400/220.jpg" alt="Poor Quality">
+        <div class="overlay">
+          <h3>🏗 Poor Quality</h3>
+          <p>Substandard cement & steel lead to unsafe structures and cracks.</p>
+        </div>
+      </div>
+      <div class="impact-card">
+        <img src="https://picsum.photos/seed/delay/400/220.jpg" alt="Delays">
+        <div class="overlay">
+          <h3>⏳ Delays</h3>
+          <p>Corruption causes months or years of construction project delays.</p>
+        </div>
+      </div>
+      <div class="impact-card">
+        <img src="https://picsum.photos/seed/impact/400/220.jpg" alt="Human Impact">
+        <div class="overlay">
+          <h3>⚠ Human Impact</h3>
+          <p>Families suffer when homes fail due to corruption-driven compromises.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+  
+  <!-- Photo Upload Section -->
+  <section class="upload-section">
+    <h2>Report Construction Issues</h2>
+    <div class="upload-container">
+      <p>Help us identify and report potential corruption or quality issues in construction projects by uploading photos.</p>
+      <div class="file-input-wrapper">
+        <input type="file" id="photo-upload" class="file-input" accept="image/*">
+        <label for="photo-upload" class="file-input-button">Choose a Photo to Upload</label>
+      </div>
+      <div id="preview-container" class="preview-container">
+        <img id="preview-image" class="preview-image" alt="Preview">
+      </div>
+      <button id="submit-button" class="submit-button">Submit Report</button>
+    </div>
+  </section>
+  
+  <section class="materials">
+    <h2>Essential Construction Materials</h2>
+    <div class="grid">
+      <div class="card">
+        <h3>Sand</h3>
+        <p class="companies">Top companies: River Sand Suppliers, Silica Sand Pvt Ltd</p>
+      </div>
+      <div class="card">
+        <h3>Bricks</h3>
+        <p class="companies">Top companies: Wienerberger, Bharat Bricks, Jindal Bricks</p>
+      </div>
+      <div class="card">
+        <h3>Cement</h3>
+        <p class="companies">Top companies: Ultratech, ACC Cement, Ambuja Cement</p>
+      </div>
+      <div class="card">
+        <h3>Steel</h3>
+        <p class="companies">Top companies: Tata Steel, JSW Steel, SAIL</p>
+      </div>
+      <div class="card">
+        <h3>Concrete</h3>
+        <p class="companies">Top companies: RMC India, ACC Concrete, Ultratech Concrete</p>
+      </div>
+    </div>
+  </section>
+  
+  <footer>
+    © 2025 Raw Verify — Building with Trust & Transparency
+  </footer>
+  
+  <div id="notification" class="notification"></div>
+  
+  <script>
+    const photoUpload = document.getElementById('photo-upload');
+    const previewContainer = document.getElementById('preview-container');
+    const previewImage = document.getElementById('preview-image');
+    const submitButton = document.getElementById('submit-button');
+    const notification = document.getElementById('notification');
+
+    function showNotification(message, duration = 3000) {
+      notification.textContent = message;
+      notification.style.display = 'block';
+      setTimeout(() => {
+        notification.style.display = 'none';
+      }, duration);
+    }
+
+    photoUpload.addEventListener('change', function() {
+      if (this.files && this.files[0]) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          previewImage.src = e.target.result;
+          previewContainer.style.display = 'block';
+          submitButton.style.display = 'inline-block';
+        }
+        reader.readAsDataURL(this.files[0]);
+      }
+    });
+
+    submitButton.addEventListener('click', function() {
+      if (previewImage.src && previewContainer.style.display === 'block') {
+        // Save uploaded image to localStorage
+        localStorage.setItem("uploadedPhoto", previewImage.src);
+        // Redirect to report.html
+        window.location.href = "report.html";
+      } else {
+        showNotification("Please upload a photo first!");
+      }
+    });
+
+    document.querySelectorAll(".impact-card").forEach(card => {
+      card.addEventListener("click", () => {
+        const title = card.querySelector("h3").innerText;
+        showNotification(`More details about: ${title}`);
+      });
+    });
+  </script>
+</body>
+</html>
