@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Material Direct Sell — Construction Marketplace Prototype</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        :root{--accent:#0d6efd;--bg:#f6f8fb;--card:#ffffff}
+        body{font-family:Inter,Segoe UI,Arial,sans-serif;background:var(--bg);margin:0;color:#1f2937}
+        header{background:linear-gradient(90deg,#0d6efd,#6c63ff);color:#fff;padding:1.2rem;text-align:center}
+        .container{max-width:980px;margin:1.4rem auto;padding:1rem}
+        .card{background:var(--card);border-radius:12px;padding:1rem;margin-bottom:1rem;box-shadow:0 6px 18px rgba(15,23,42,0.06)}
+        h2{color:var(--accent);margin:0 0 .6rem}
+        .steps{display:flex;gap:.6rem;flex-wrap:wrap;margin-bottom:.8rem}
+        .step{flex:1;padding:.5rem;border-radius:8px;text-align:center;background:#eef3ff;color:#0b3b9a;font-weight:600}
+        .controls{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:.8rem}
+        label{display:block;font-size:.9rem;margin-bottom:.4rem}
+        input[type=file]{display:block}
+        .preview{height:160px;border-radius:8px;object-fit:cover;width:100%;background:#eef2ff;display:flex;align-items:center;justify-content:center;color:#6b7280}
+        .btn{background:var(--accent);color:#fff;padding:.6rem 1rem;border-radius:8px;border:0;cursor:pointer}
+        .muted{color:white;font-size:.9rem}
+        .row{display:flex;gap:.6rem}
+        .row > *{flex:1}
+        .summary{background:#f8fafc;padding:.8rem;border-radius:8px}
+        .small{font-size:.85rem}
+        footer{text-align:center;margin-top:1rem;padding:1rem;color:#475569}
+        .danger{color:#b91c1c}
+        .success{color:#065f46}
+        .chip{display:inline-block;padding:.25rem .5rem;border-radius:999px;background:#eef2ff;color:#0b3b9a;font-weight:600}
+        .hidden{display:none}
+        .note{font-size:.88rem;color:#374151}
+        textarea{width:100%;min-height:80px;border-radius:8px;padding:.5rem;border:1px solid #e6eef8}
+        .modal {
+            position: fixed;
+            z-index: 100;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.4);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .modal-content {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            width: 90%;
+            max-width: 400px;
+            text-align: center;
+        }
+        .loader {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #0d6efd;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Direct Construction Materials</h1>
+        <div class="muted">Step-wise flow: Photo detection → Price verification → Delivery address → UPI payment</div>
+    </header>
+
+    <div class="container">
+        <div class="card">
+            <div class="steps">
+                <div class="step">1. Capture / Upload</div>
+                <div class="step">2. Verify Price</div>
+                <div class="step">3. Delivery Address</div>
+                <div class="step">4. Pay (UPI)</div>
+            </div>
+
+            <!-- STEP 1: Camera / Photo -->
+            <section id="step1" class="card">
+                <h2>1) Camera / Photo — Detect Material</h2>
+                <p class="note">Use your camera or upload a photo of the material. A Google Gemini-powered scanner will provide a quality analysis.</p>
+                <div class="controls">
+                    <div>
+                        <label for="photoInput">Take a Photo / Upload an Image</label>
+                        <input id="photoInput" type="file" accept="image/*" capture="environment">
+                        <div id="preview" class="preview">No image selected</div>
+                    </div>
+                    <div>
+                        <label>Detected Material</label>
+                        <div id="detected" class="summary small">—</div>
+
+                        <label style="margin-top:.6rem">Quality Analysis</label>
+                        <div id="analysisResult" class="summary small">
+                            <span id="analysisText">—</span>
+                            <div id="analysisLoader" class="loader mx-auto hidden"></div>
+                        </div>
+
+                        <label style="margin-top:.6rem">If detection is wrong, choose manually</label>
+                        <select id="manualMaterial">
+                            <option value="">— select material —</option>
+                            <option>Steel</option>
+                            <option>Cement</option>
+                            <option>Sand</option>
+                            <option>Bricks</option>
+                            <option>Gravel</option>
+                        </select>
+
+                        <div style="margin-top:.6rem">
+                            <button class="btn" id="toPriceBtn">Confirm & Continue to Price</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- STEP 2: Price Verification -->
+            <section id="step2" class="card hidden">
+                <h2>2) Verify Price</h2>
+                <p class="note">Enter the seller's MRP/unit price and the unit price you require. The prototype compares and shows if seller price is cheaper or costlier.</p>
+
+                <div class="controls">
+                    <div>
+                        <label>Detected Material</label>
+                        <div id="materialTag" class="chip">—</div>
+
+                        <label style="margin-top:.6rem">Seller MRP (per unit)</label>
+                        <input id="sellerPrice" type="number" placeholder="e.g., 5000">
+
+                        <label style="margin-top:.6rem">Your Required Price (max per unit you want)</label>
+                        <input id="requiredPrice" type="number" placeholder="e.g., 4800">
+
+                        <div style="margin-top:.6rem">
+                            <button class="btn" id="checkPriceBtn">Check Price</button>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label>Comparison Result</label>
+                        <div id="priceResult" class="summary">—</div>
+
+                        <label style="margin-top:.6rem">If you accept seller price, select quantity to buy (bulk orders supported)</label>
+                        <input id="quantity" type="number" value="1" min="1">
+
+                        <div style="margin-top:.6rem">
+                            <button class="btn" id="acceptPriceBtn">Accept Price & Proceed to Delivery</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- STEP 3: Delivery Address -->
+            <section id="step3" class="card hidden">
+                <h2>3) Delivery Address</h2>
+                <p class="note">Enter the delivery address for the bulk order.</p>
+                <label>Customer / Site Name</label>
+                <input id="custName" placeholder="e.g., Site A - Block 5">
+
+                <label style="margin-top:.6rem">Full Address</label>
+                <textarea id="address"></textarea>
+
+                <label style="margin-top:.6rem">Expected Delivery Date (optional)</label>
+                <input id="deliveryDate" type="date">
+
+                <div style="margin-top:.6rem">
+                    <button class="btn" id="toPayBtn">Save Address & Proceed to Payment</button>
+                </div>
+
+                <div style="margin-top:.8rem" class="muted small">Orders sold directly to large contractors — this flow removes middlemen and commission by sending payment directly to the seller's UPI.</div>
+            </section>
+
+            <!-- STEP 4: Payment (UPI) -->
+            <section id="step4" class="card hidden">
+                <h2>4) Payment via UPI</h2>
+                <p class="note">Enter seller UPI details to pay directly. This generates a UPI deep-link (opens supported UPI apps on mobile). For web-only testing, we simulate payment success.</p>
+
+                <div class="controls">
+                    <div>
+                        <label>Seller Name</label>
+                        <input id="sellerName" placeholder="e.g., ABC Traders">
+
+                        <label style="margin-top:.6rem">Seller UPI ID (VPA)</label>
+                        <input id="sellerVPA" placeholder="e.g., seller@bank">
+
+                        <label style="margin-top:.6rem">Total Amount (auto)</label>
+                        <input id="totalAmount" readonly>
+                    </div>
+
+                    <div>
+                        <label>Payment Notes (optional)</label>
+                        <input id="paymentNote" placeholder="e.g., Order #123 - Cement 1000 bags">
+
+                        <div style="margin-top:.6rem">
+                            <button class="btn" id="payBtn">Generate UPI Link & Pay</button>
+                        </div>
+
+                        <div style="margin-top:.6rem">
+                            <button id="simulateSuccess" class="btn" style="background:#10b981">Simulate Payment Success (for demo)</button>
+                        </div>
+
+                        <div id="paymentStatus" class="summary" style="margin-top:.6rem">—</div>
+                    </div>
+                </div>
+
+                <div style="margin-top:.8rem">After successful payment, the order JSON is prepared for the seller and the buyer. You can <button id="exportBtn">Download Order JSON</button>.</div>
+            </section>
+
+            <!-- Order JSON preview -->
+            <section id="orderPreview" class="card hidden">
+                <h2>Order Summary (JSON)</h2>
+                <pre id="orderJson" style="white-space:pre-wrap;background:#f3f4f6;padding:1rem;border-radius:8px;max-height:280px;overflow:auto"></pre>
+            </section>
+
+            <footer>Prototype: Replace simulated detection & payment with real ML model + payment gateway for production use.</footer>
+        </div>
+    </div>
+
+    <!-- Custom Modal for Messages -->
+    <div id="customModal" class="modal hidden">
+        <div class="modal-content">
+            <p id="modalMessage" class="mb-4"></p>
+            <button id="closeModalBtn" class="btn">OK</button>
+        </div>
+    </div>
+
+    <script>
+        // Simple prototype logic
+        const photoInput = document.getElementById('photoInput');
+        const preview = document.getElementById('preview');
+        const detected = document.getElementById('detected');
+        const analysisResultDiv = document.getElementById('analysisResult');
+        const analysisTextDiv = document.getElementById('analysisText');
+        const analysisLoaderDiv = document.getElementById('analysisLoader');
+        const manualMaterial = document.getElementById('manualMaterial');
+        const toPriceBtn = document.getElementById('toPriceBtn');
+
+        const step1 = document.getElementById('step1');
+        const step2 = document.getElementById('step2');
+        const step3 = document.getElementById('step3');
+        const step4 = document.getElementById('step4');
+
+        const materialTag = document.getElementById('materialTag');
+        const sellerPrice = document.getElementById('sellerPrice');
+        const requiredPrice = document.getElementById('requiredPrice');
+        const checkPriceBtn = document.getElementById('checkPriceBtn');
+        const priceResult = document.getElementById('priceResult');
+        const acceptPriceBtn = document.getElementById('acceptPriceBtn');
+        const quantity = document.getElementById('quantity');
+
+        const custName = document.getElementById('custName');
+        const address = document.getElementById('address');
+        const deliveryDate = document.getElementById('deliveryDate');
+        const toPayBtn = document.getElementById('toPayBtn');
+
+        const sellerName = document.getElementById('sellerName');
+        const sellerVPA = document.getElementById('sellerVPA');
+        const totalAmount = document.getElementById('totalAmount');
+        const paymentNote = document.getElementById('paymentNote');
+        const payBtn = document.getElementById('payBtn');
+        const simulateSuccess = document.getElementById('simulateSuccess');
+        const paymentStatus = document.getElementById('paymentStatus');
+
+        const exportBtn = document.getElementById('exportBtn');
+        const orderPreview = document.getElementById('orderPreview');
+        const orderJson = document.getElementById('orderJson');
+
+        const modal = document.getElementById('customModal');
+        const modalMessage = document.getElementById('modalMessage');
+        const closeModalBtn = document.getElementById('closeModalBtn');
+        closeModalBtn.addEventListener('click', () => {
+            modal.classList.add('hidden');
+        });
+
+        let detectedMaterial = null;
+        let analysisText = null;
+        let order = {};
+
+        // Helper function to show a modal message
+        function showMessageModal(message) {
+            modalMessage.innerText = message;
+            modal.classList.remove('hidden');
+        }
+
+        // --- Gemini API Call for Image Analysis ---
+        const analyzeImageWithGemini = async (base64ImageData) => {
+            analysisTextDiv.innerText = '';
+            analysisLoaderDiv.classList.remove('hidden');
+            analysisResultDiv.classList.remove('hidden');
+
+            const prompt = "Analyze the provided image. The image contains a construction material. Describe the material, its condition, and provide a quality assessment. For example, for sand, it might be 'Fine-grained river sand, high quality.' or for cement bags 'Multiple bags of brand ABC cement, appears to be in good condition.' Keep the description brief and professional. Conclude the analysis with a single word classification of the material: either 'Cement', 'Steel', 'Sand', 'Bricks', or 'Gravel'.";
+
+            const payload = {
+                contents: [{
+                    role: "user",
+                    parts: [
+                        { text: prompt },
+                        {
+                            inlineData: {
+                                mimeType: "image/jpeg",
+                                data: base64ImageData
+                            }
+                        }
+                    ]
+                }],
+            };
+            const apiKey = ""
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
+
+            try {
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                if (!response.ok) {
+                    throw new Error(`API call failed with status: ${response.status}`);
+                }
+                const result = await response.json();
+                const text = result?.candidates?.[0]?.content?.parts?.[0]?.text;
+
+                analysisLoaderDiv.classList.add('hidden');
+                analysisTextDiv.innerText = text || 'Analysis failed. Could not get results.';
+                
+                // Extract the final keyword for material detection
+                const materialKeywords = ['Cement', 'Steel', 'Sand', 'Bricks', 'Gravel'];
+                const detectedKeyword = materialKeywords.find(keyword => text.includes(keyword));
+                
+                return { analysis: text, material: detectedKeyword || null };
+            } catch (error) {
+                console.error("Error with Gemini API call:", error);
+                analysisLoaderDiv.classList.add('hidden');
+                analysisTextDiv.innerText = "Error during analysis. Please try again.";
+                return { analysis: "Error during analysis.", material: null };
+            }
+        };
+
+        // Image preview and real-time analysis
+        photoInput.addEventListener('change', async e => {
+            const file = e.target.files && e.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = async () => {
+                const url = URL.createObjectURL(file);
+                preview.innerHTML = '';
+                const img = document.createElement('img');
+                img.src = url;
+                img.className = 'preview';
+                img.onload = () => URL.revokeObjectURL(url);
+                preview.appendChild(img);
+
+                const base64Image = reader.result.split(',')[1];
+                const analysisData = await analyzeImageWithGemini(base64Image);
+                
+                analysisText = analysisData.analysis;
+                detectedMaterial = analysisData.material;
+
+                if (detectedMaterial) {
+                    detected.innerText = detectedMaterial;
+                    manualMaterial.value = detectedMaterial;
+                } else {
+                    detected.innerText = 'Could not detect material.';
+                }
+            };
+            reader.readAsDataURL(file);
+        });
+
+        toPriceBtn.addEventListener('click', () => {
+            if(manualMaterial.value){ detectedMaterial = manualMaterial.value }
+            if(!detectedMaterial){ showMessageModal('Please upload an image or select a material.'); return }
+            materialTag.innerText = detectedMaterial;
+            step1.classList.add('hidden');
+            step2.classList.remove('hidden');
+            window.scrollTo(0,0);
+        });
+
+        checkPriceBtn.addEventListener('click', () => {
+            const s = parseFloat(sellerPrice.value);
+            const r = parseFloat(requiredPrice.value);
+            if(isNaN(s) || isNaN(r)){ showMessageModal('Enter both seller and required price'); return }
+            if(s === r) priceResult.innerHTML = '<span class="success">Exact match — suitable for your requirement.</span>';
+            else if(s < r) priceResult.innerHTML = '<span class="success">Seller price is CHEAPER than your required price. Good deal!</span>';
+            else priceResult.innerHTML = '<span class="danger">Seller price is COSTLIER than your required price. Consider negotiating.</span>';
+        });
+
+        acceptPriceBtn.addEventListener('click', () => {
+            const s = parseFloat(sellerPrice.value);
+            const q = parseFloat(quantity.value);
+            if(isNaN(s) || isNaN(q) || q<=0){ showMessageModal('Enter valid price & quantity'); return }
+            order.item = detectedMaterial;
+            order.unitPrice = s;
+            order.quantity = q;
+            order.total = +(s * q).toFixed(2);
+            order.qualityAnalysis = analysisText;
+            step2.classList.add('hidden');
+            step3.classList.remove('hidden');
+            totalAmount.value = order.total;
+            window.scrollTo(0,0);
+        });
+
+        toPayBtn.addEventListener('click', () => {
+            const name = custName.value.trim();
+            const addr = address.value.trim();
+            if(!name || !addr){ showMessageModal('Enter customer/site name and address'); return }
+            order.customer = {name, address: addr, deliveryDate: deliveryDate.value};
+            step3.classList.add('hidden');
+            step4.classList.remove('hidden');
+            sellerName.value = '';
+            sellerVPA.value = '';
+            paymentNote.value = `Order for ${order.quantity} x ${order.item}`;
+            totalAmount.value = order.total;
+            window.scrollTo(0,0);
+        });
+
+        payBtn.addEventListener('click', () => {
+            const vpa = sellerVPA.value.trim();
+            const sName = sellerName.value.trim();
+            const amt = totalAmount.value;
+            if(!vpa || !sName){ showMessageModal('Enter seller name and UPI ID'); return }
+
+            // Build UPI deep link (standard format)
+            const upiLink = `upi://pay?pa=${encodeURIComponent(vpa)}&pn=${encodeURIComponent(sName)}&am=${encodeURIComponent(amt)}&tn=${encodeURIComponent(paymentNote.value||'Order Payment')}&cu=INR`;
+
+            // For mobile browsers, opening this link should open UPI app. Here we also show it to the user.
+            paymentStatus.innerHTML = `UPI link generated. <a href="${upiLink}">Open in UPI app</a> (or copy the UPI ID and pay manually).`;
+
+            // Save for order JSON
+            order.seller = {name: sName, vpa: vpa};
+        });
+
+        simulateSuccess.addEventListener('click', () => {
+            paymentStatus.innerHTML = '<span class="success">Payment recorded (simulated). Order placed.</span>';
+            order.payment = {status: 'PAID', method: 'UPI', note: paymentNote.value};
+            showOrder();
+        });
+
+        function showOrder(){
+            orderPreview.classList.remove('hidden');
+            orderJson.innerText = JSON.stringify(order, null, 2);
+            window.scrollTo(0,document.body.scrollHeight);
+        }
+
+        exportBtn.addEventListener('click', () => {
+            const data = JSON.stringify(order, null, 2);
+            const blob = new Blob([data], {type: 'application/json'});
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `order_${Date.now()}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+        });
+
+        // Allow manual material override updates
+        manualMaterial.addEventListener('change', () => {
+            if(manualMaterial.value){ 
+                detectedMaterial = manualMaterial.value; 
+                detected.innerText = detectedMaterial;
+            }
+        });
+    </script>
+</body>
+</html>
