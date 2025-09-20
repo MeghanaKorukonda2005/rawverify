@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Daily Corruption Ratio - Raw Verify</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    body {
+      margin: 0;
+      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      background: #f9f9fc;
+      color: #222;
+    }
+    header {
+      background: linear-gradient(90deg, #1e3a8a, #b30059);
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+    }
+    header h1 {
+      margin: 0;
+      font-size: 2.5rem;
+      font-weight: 900;
+      text-align: center;
+      flex: 1;
+      color: #fff;
+    }
+    nav {
+      display: flex;
+      gap: 1.5rem;
+      align-items: center;
+    }
+    nav a {
+      text-decoration: none;
+      color: #fff;
+      font-weight: bold;
+      transition: color 0.3s;
+    }
+    nav a:hover {
+      color: #ffe6f0;
+    }
+    .section {
+      max-width: 1200px;
+      margin: 2rem auto;
+      padding: 2rem;
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 6px 16px rgba(0,0,0,0.1);
+    }
+    .section h2 {
+      text-align: center;
+      margin-bottom: 1rem;
+      color: #1e3a8a;
+    }
+    canvas {
+      margin: 2rem auto;
+      display: block;
+      max-width: 800px;
+    }
+    footer {
+      text-align: center;
+      padding: 1rem;
+      background: #1e3a8a;
+      margin-top: 3rem;
+      font-size: 0.9rem;
+      color: #fff;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Raw Verify</h1>
+    <nav>
+      <a href="index.html">Home</a>
+      <a href="integrity.html">Integrity Hub</a>
+      <a href="realcases.html">Real Case Scenarios</a>
+      <a href="corruption.html" style="color: #ffe6f0;">Daily Corruption Ratio</a>
+      <a href="about.html">About Us</a>
+    </nav>
+  </header>
+
+  <!-- Section 1: Corruption by Year -->
+  <section class="section">
+    <h2>Corruption Ratio by Year (Construction Field)</h2>
+    <canvas id="yearlyBarChart"></canvas>
+  </section>
+
+  <!-- Section 2: India Corruption Overview -->
+  <section class="section">
+    <h2>India Corruption Overview (Comparison)</h2>
+    <canvas id="overviewChart"></canvas>
+  </section>
+
+  <!-- Section 3: Most Corrupt States -->
+  <section class="section">
+    <h2>Most Corrupt States in India (Construction Field)</h2>
+    <canvas id="statePieChart"></canvas>
+  </section>
+
+  <footer>
+    © 2025 Raw Verify — Building with Trust & Transparency
+  </footer>
+
+  <script>
+    // 1. Corruption Ratio by Year (Bar Graph)
+    const yearlyCtx = document.getElementById('yearlyBarChart').getContext('2d');
+    new Chart(yearlyCtx, {
+      type: 'bar',
+      data: {
+        labels: ['2019', '2020', '2021', '2022', '2023'],
+        datasets: [{
+          label: 'Corruption Index (Construction)',
+          data: [62, 60, 59, 60, 58],
+          backgroundColor: '#b30059'
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: { legend: { display: false } },
+        scales: {
+          y: { beginAtZero: true, title: { display: true, text: 'Corruption Index' } }
+        }
+      }
+    });
+
+    // 2. India Corruption Overview (Bar + Line)
+    const overviewCtx = document.getElementById('overviewChart').getContext('2d');
+    new Chart(overviewCtx, {
+      data: {
+        labels: ['2019', '2020', '2021', '2022', '2023'],
+        datasets: [
+          {
+            type: 'bar',
+            label: 'Corruption Index (India)',
+            data: [41, 40, 40, 40, 40],
+            backgroundColor: '#1e3a8a'
+          },
+          {
+            type: 'line',
+            label: 'Trend',
+            data: [41, 40, 40, 40, 40],
+            borderColor: '#b30059',
+            borderWidth: 2,
+            fill: false
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+        scales: {
+          y: { beginAtZero: true, title: { display: true, text: 'Index Value' } }
+        }
+      }
+    });
+
+    // 3. Most Corrupt States (Pie Chart)
+    const stateCtx = document.getElementById('statePieChart').getContext('2d');
+    new Chart(stateCtx, {
+      type: 'pie',
+      data: {
+        labels: ['Bihar', 'Jharkhand', 'Odisha', 'Madhya Pradesh', 'Rajasthan', 'Uttar Pradesh'],
+        datasets: [{
+          label: 'Corruption Index',
+          data: [76.4, 72.3, 69.1, 67.8, 65.2, 63.7],
+          backgroundColor: [
+            '#b30059', '#1e3a8a', '#ff9933', '#339966', '#cc0066', '#663399'
+          ]
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: { legend: { position: 'bottom' } }
+      }
+    });
+  </script>
+</body>
+</html>
