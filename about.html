@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>About Us — Integrity Hub</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Mermaid for diagrams -->
+  <script type="module">
+    import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs";
+    mermaid.initialize({ startOnLoad: true });
+  </script>
+</head>
+<body class="bg-gray-100 font-sans text-gray-800">
+  <header class="bg-indigo-600 text-white p-6 shadow-md">
+    <h1 class="text-3xl font-bold">About Integrity Hub</h1>
+    <p class="text-sm mt-1">Building trust in construction supply chain with AI + Blockchain</p>
+  </header>
+
+  <main class="max-w-5xl mx-auto p-6 space-y-8">
+    <!-- Section 1: Idea -->
+    <section class="bg-white rounded-xl shadow p-6">
+      <h2 class="text-2xl font-semibold mb-3 text-indigo-600">Our Idea</h2>
+      <p>
+        Integrity Hub is a transparent marketplace that connects
+        <span class="font-semibold">construction material buyers</span> (contractors, government projects)
+        with <span class="font-semibold">sellers</span> (suppliers).  
+        Our focus is on removing middlemen, ensuring materials are genuine, 
+        and making payments secure with UPI / RuPay.
+      </p>
+    </section>
+
+    <!-- Section 2: How It Works -->
+    <section class="bg-white rounded-xl shadow p-6">
+      <h2 class="text-2xl font-semibold mb-3 text-indigo-600">How to Use</h2>
+      <ol class="list-decimal pl-5 space-y-2">
+        <li><strong>Buyer</strong> requests a product (Cement, Steel, Sand, Bricks, etc.).</li>
+        <li><strong>Seller</strong> uploads product photos with geo-tags and live webcam proof.</li>
+        <li>Our <strong>AI scanner</strong> checks quality (Best / Good / Average / Poor).</li>
+        <li>Buyer verifies and places a <strong>bulk order</strong> (200–1000kg).</li>
+        <li>Payment is done in installments via <strong>UPI / RuPay</strong>.</li>
+        <li>Order is delivered to site and logged for <strong>accountability</strong>.</li>
+      </ol>
+    </section>
+
+    <!-- Section 3: Flow Diagram -->
+    <section class="bg-white rounded-xl shadow p-6">
+      <h2 class="text-2xl font-semibold mb-3 text-indigo-600">System Flow</h2>
+      <div class="bg-gray-50 p-4 rounded-lg overflow-auto">
+        <pre class="mermaid">
+          graph TD
+          A[Buyer: Request Material] --> B[Seller: Upload Photos + Geo-tag]
+          B --> C[AI Scanner: Verify Quality]
+          C --> D[Buyer: Verify & Rate Product]
+          D --> E[Place Bulk Order 200–1000kg]
+          E --> F[Payment: UPI / RuPay Installments]
+          F --> G[Delivery to Site]
+          G --> H[Blockchain Log + Accountability]
+        </pre>
+      </div>
+    </section>
+
+    <!-- Section 4: Connections -->
+    <section class="bg-white rounded-xl shadow p-6">
+      <h2 class="text-2xl font-semibold mb-3 text-indigo-600">Connections</h2>
+      <div class="grid md:grid-cols-2 gap-6">
+        <div>
+          <h3 class="font-semibold text-lg">For Buyers</h3>
+          <ul class="list-disc pl-5 space-y-1 text-sm">
+            <li>Request materials directly</li>
+            <li>Check real-time quality proof</li>
+            <li>Flexible installment payments</li>
+          </ul>
+        </div>
+        <div>
+          <h3 class="font-semibold text-lg">For Sellers</h3>
+          <ul class="list-disc pl-5 space-y-1 text-sm">
+            <li>Showcase materials with AI-verified proof</li>
+            <li>Get bulk orders directly</li>
+            <li>Receive payments securely</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- Section 5: Vision -->
+    <section class="bg-white rounded-xl shadow p-6">
+      <h2 class="text-2xl font-semibold mb-3 text-indigo-600">Our Vision</h2>
+      <p>
+        We aim to make construction projects <strong>transparent, fair, and accountable</strong>.
+        By combining AI-powered material verification, blockchain-based logs, and digital payments,
+        we reduce corruption and ensure quality for public infrastructure.
+      </p>
+    </section>
+  </main>
+
+  <footer class="bg-gray-800 text-gray-200 text-center py-4 text-sm">
+    © 2025 Integrity Hub — Hackathon Prototype
+  </footer>
+</body>
+</html>
